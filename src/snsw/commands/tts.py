@@ -99,7 +99,9 @@ def finetune(
             rel_path, text = row[0], row[1]
             # Resolve absolute path or keep relative if trainer supports it. 
             # Usually absolute is safer.
-            wav_path = dataset_path / rel_path
+            wav_path = (dataset_path / rel_path).resolve()
+            if not wav_path.is_relative_to(dataset_path.resolve()):
+                continue
             if not wav_path.exists():
                 continue
                 
