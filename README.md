@@ -11,6 +11,8 @@
 - **柔軟性**: 任意のテキストからの音声生成
 
 ## 技術スタック
+### 使用モデル一覧
+- [MODELS.md](./docs/MODELS.md) に、正式採用しているモデル（XTTS-v2 / RVC / Whisper large-v3）を明示しています。
 
 ### コアモデル
 *   **Coqui XTTS-v2**: メインの音声合成エンジン。日本語品質が高く、少量のデータでも高品質なクローニング（ゼロショット）が可能。
@@ -114,6 +116,7 @@ snsw rvc convert outputs/xtts.wav --out-wav outputs/rvc.wav --template "python p
 
 ## 参考資料
 詳細は以下のドキュメントを参照してください。
+- [MODELS (使用モデル一覧)](./docs/MODELS.md)
 - [ADR (Architecture Decision Record)](./docs/ADR.md)
 - [ENV (環境構築ガイド)](./docs/ENV.md)
 - [STAC (技術スタック比較)](./docs/STAC.md)
