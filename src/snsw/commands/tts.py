@@ -12,6 +12,19 @@ app = typer.Typer(no_args_is_help=True)
 
 
 def _load_tts(model_name: str, gpu: bool):
+    """
+    Load the Coqui TTS model.
+
+    Args:
+        model_name: The name of the model to load.
+        gpu: Whether to use GPU for inference.
+
+    Returns:
+        The loaded TTS model instance.
+
+    Raises:
+        MissingDependencyError: If the 'TTS' package is not installed.
+    """
     try:
         from TTS.api import TTS  # type: ignore
     except Exception as e:  # pragma: no cover
@@ -33,6 +46,12 @@ def clone(
     ),
     gpu: bool = typer.Option(True, help="Use GPU if available"),
 ) -> None:
+    """
+    Generate speech using XTTS-v2 voice cloning.
+
+    This command loads the XTTS-v2 model and generates speech from the provided text,
+    using the reference speaker audio to clone the voice.
+    """
     ensure_dir(out_wav.parent)
     tts = _load_tts(model_name=model_name, gpu=gpu)
 
