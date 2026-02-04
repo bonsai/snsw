@@ -159,7 +159,7 @@ def split_xtts(
         
         if not sub_chunks or (len(sub_chunks) == 1 and len(sub_chunks[0]) == len(chunk)):
             # Failed to split, try with smaller silence
-            return recursive_split(chunk, int(min_silence_ms * 0.7))
+            return recursive_split(chunk, int(min_silence_ms * SILENCE_REDUCTION_FACTOR))
             
         final_chunks = []
         for sub in sub_chunks:
