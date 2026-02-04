@@ -128,7 +128,13 @@ def split_xtts(
     Uses a recursive strategy to break down long segments.
     """
     _require_ffmpeg()
+    _require_ffmpeg()
     
+    # Constants for XTTS splitting logic
+    MIN_SILENCE_MS_THRESHOLD = 200
+    SILENCE_REDUCTION_FACTOR = 0.7
+    INITIAL_SILENCE_MS = 1000
+    MIN_CLIP_SKIP_THRESHOLD_S = 2.0
     try:
         from pydub import AudioSegment  # type: ignore
         from pydub.silence import split_on_silence  # type: ignore
