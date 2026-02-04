@@ -40,6 +40,73 @@
     *   必要に応じてRVCモデルも学習させます。
 4.  **音声生成**: テキストを入力して音声を生成し、RVCで質感を整えます。
 
+## 実装コード（CLI）
+
+このリポジトリには、上記ワークフローをローカルで回すための最小CLI（Python）が含まれます。
+学習（ファインチューニング）の本体は `AllTalk TTS` / `xtts-finetune-webui` 等の既存UIを推奨し、本CLIは **データ作成・推論の補助** にフォーカスします。
+
+### 前提
+
+* Python 3.10+
+* `ffmpeg`（`pydub` による変換/分割で使用）
+
+### インストール
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -U pip
+pip install -e ".[dev]"
+# Whisper / XTTS を使う場合
+pip install -e ".[whisper,tts]"
+```
+
+### 使い方（例）
+
+1) ダウンロード（yt-dlp）
+
+```powershell
+snsw download youtube "https://www.youtube.com/watch?v=..." --out-dir data/raw
+```
+
+2) WAV 化（22050Hz / mono / 16bit）
+
+```powershell
+snsw audio to-wav data/raw/input.mp4 --out data/wav/input.wav
+```
+
+3) 無音で自動分割
+
+```powershell
+snsw audio split-silence data/wav/input.wav --out-dir data/clips
+```
+
+4) クリップを文字起こし（Whisper）して `*.txt` を生成
+
+```powershell
+snsw transcribe clips data/clips --language ja --model-size large-v3 --out-manifest data/transcripts.jsonl
+```
+
+5) `*.txt` を目視で修正（重要）
+
+6) 学習用データセット（LJSpeech 互換）を作成
+
+```powershell
+snsw dataset build data/clips --out-dir datasets/shinsho --hardlink
+```
+
+7) 推論（XTTS-v2 ゼロショット例）
+
+```powershell
+snsw tts clone "今日はいい天気ですね" --speaker-wav data/ref.wav --out-wav outputs/xtts.wav --language ja
+```
+
+8) RVC 変換（外部コマンドをテンプレートで実行）
+
+```powershell
+snsw rvc convert outputs/xtts.wav --out-wav outputs/rvc.wav --template "python path\\to\\infer_cli.py --model models\\shinsho.pth --input {in} --output {out}"
+```
+
 ## 権利関係・注意事項
 
 *   **著作権について**: 1950〜60年代の音源を使用する場合、著作権や著作隣接権（レコード会社・放送局など）に十分配慮してください。
@@ -47,6 +114,6 @@
 
 ## 参考資料
 詳細は以下のドキュメントを参照してください。
-- [ADR (Architecture Decision Record)](./ADR)
-- [ENV (環境構築ガイド)](./ENV)
-- [STAC (技術スタック比較)](./STAC)
+- [ADR (Architecture Decision Record)](./docs/ADR.md)
+- [ENV (環境構築ガイド)](./docs/ENV.md)
+- [STAC (技術スタック比較)](./docs/STAC.md)
