@@ -27,7 +27,7 @@ def convert(
 ) -> None:
     ensure_dir(out_wav.parent)
 
-    cmd_str = template.format(in=str(input_wav), out=str(out_wav))
+    cmd_str = template.format(**{"in": str(input_wav), "out": str(out_wav)})
     cmd = shlex.split(cmd_str, posix=False)
 
     console.print("[bold]Running[/bold] " + cmd_str)
