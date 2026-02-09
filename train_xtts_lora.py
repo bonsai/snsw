@@ -1,22 +1,22 @@
 import sys
 import os
+import json
+import time
 from pathlib import Path
 import argparse
+from datetime import datetime
 
 # --- Kaggle Environment Path Setup ---
-# Default paths for Kaggle environment
 KAGGLE_WORKING = Path("/kaggle/working")
 PROJECT_ROOT = KAGGLE_WORKING / "snsw"
 DATA_ROOT = KAGGLE_WORKING / "data"
 
-# Add current directory and PROJECT_ROOT to sys.path
 current_dir = Path(__file__).parent.absolute()
 if str(current_dir) not in sys.path:
     sys.path.append(str(current_dir))
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.append(str(PROJECT_ROOT))
 
-# Import required libraries
 try:
     from trainer import Trainer, TrainerArgs
     from TTS.config.shared_configs import BaseDatasetConfig
@@ -25,40 +25,64 @@ try:
     from peft import LoraConfig, get_peft_model
 except ImportError as e:
     print(f"Error importing libraries: {e}")
-    print("Please ensure 'coqui-tts' and 'trainer' are installed.")
+
+def generate_report(output_dir, stats):
+    """学習結果のレポートを生成する"""
+    report_path = Path(output_dir) / "training_report.md"
+    
+    report_content = f"""# XTTS LoRA Training Report
+Generated at: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+
+## Summary
+- **Status**: Success ✅
+- **Duration**: {stats.get('duration', 'N/A')}
+- **Epochs**: {stats.get('epochs', 'N/A')}
+- **Batch Size**: {stats.get('batch_size', 'N/A')}
+
+## Training Stats
+- **Train Samples**: {stats.get('train_samples', 'N/A')}
+- **Eval Samples**: {stats.get('eval_samples', 'N/A')}
+- **Trainable Parameters**: {stats.get('trainable_params', 'N/A')}
+
+## Output Locations
+- **LoRA Adapter**: `{stats.get('lora_path', 'N/A')}`
+- **Config**: `{stats.get('config_path', 'N/A')}`
+
+## Environment
+- **Project Root**: `{PROJECT_ROOT}`
+- **Dataset**: `{stats.get('dataset_path', 'N/A')}`
+"""
+    with open(report_path, "w") as f:
+        f.write(report_content)
+    
+    # JSON形式でも保存
+    json_path = Path(output_dir) / "training_stats.json"
+    with open(json_path, "w") as f:
+        json.dump(stats, f, indent=4)
+        
+    print(f"Report generated: {report_path}")
 
 def main():
+    start_time = time.time()
     parser = argparse.ArgumentParser(description="XTTS LoRA Training for Kaggle")
     parser.add_argument("--dataset_path", type=str, default=str(DATA_ROOT / "metadata.csv"), help="Path to metadata.csv")
     parser.add_argument("--epochs", type=int, default=1, help="Number of training epochs")
     args = parser.parse_args()
 
-    # Define paths based on the expected structure
-    # We use current_dir as fallback for local testing/different structures
     PRETRAINED_MODEL_ROOT = PROJECT_ROOT / "pretrained_model"
     if not PRETRAINED_MODEL_ROOT.exists():
         PRETRAINED_MODEL_ROOT = current_dir / "pretrained_model"
         
     MYTTSDATASET_ROOT = DATA_ROOT
-    if not MYTTSDATASET_ROOT.exists():
-        MYTTSDATASET_ROOT = current_dir / "data"
-
     SPEAKER_REFERENCE_ROOT = PROJECT_ROOT / "speaker_reference"
-    if not SPEAKER_REFERENCE_ROOT.exists():
-        SPEAKER_REFERENCE_ROOT = current_dir / "speaker_reference"
-
     OUTPUT_ROOT_DIR = PROJECT_ROOT / "training_output"
-    if not OUTPUT_ROOT_DIR.exists():
-        OUTPUT_ROOT_DIR = current_dir / "training_output"
 
-    # Files to check
     XTTS_MEL_PATH = PRETRAINED_MODEL_ROOT / "mel_stats.pth"
     XTTS_DVAE_PATH = PRETRAINED_MODEL_ROOT / "dvae.pth"
     XTTS_MODEL_PATH = PRETRAINED_MODEL_ROOT / "model.pth"
     XTTS_TOKENIZER_PATH = PRETRAINED_MODEL_ROOT / "vocab.json"
     
     SPEAKER_REFERENCE_WAV_PATH = SPEAKER_REFERENCE_ROOT / "reference.wav"
-    # Fallback for speaker reference
     if not SPEAKER_REFERENCE_WAV_PATH.exists():
         SPEAKER_REFERENCE_WAV_PATH = current_dir / "audio-source" / "001.wav"
 
@@ -66,23 +90,15 @@ def main():
     LORA_ADAPTER_PATH = OUTPUT_PATH / "lora_adapter"
     XTTS_LORA_ORIGINAL_CONFIG_PATH = LORA_ADAPTER_PATH / "original_xtts_config.json"
 
-    print(f"--- Path Verification ---")
-    print(f"Project Root: {PROJECT_ROOT}")
-    print(f"Dataset Path: {args.dataset_path}")
-    print(f"Reference Audio: {SPEAKER_REFERENCE_WAV_PATH}")
-
-    # Dataset Configuration
     config_dataset = BaseDatasetConfig(
         formatter="ljspeech",
         dataset_name="ljspeech",
         path=str(MYTTSDATASET_ROOT),
         meta_file_train=args.dataset_path,
-        language="ja", # Set to Japanese based on notebook context
+        language="ja",
     )
 
     DATASETS_CONFIG_LIST = [config_dataset]
-
-    print("Loading training samples...")
     train_samples, eval_samples = load_tts_samples(
         DATASETS_CONFIG_LIST,
         eval_split=True,
@@ -90,7 +106,6 @@ def main():
         eval_split_size=0.05,
     )
 
-    # Model Arguments
     model_args = GPTArgs(
         max_conditioning_length=132300,
         min_conditioning_length=66150,
@@ -114,7 +129,6 @@ def main():
         output_sample_rate=24000
     )
 
-    # Trainer Configuration
     config = GPTTrainerConfig(
         output_path=str(OUTPUT_PATH),
         model_args=model_args,
@@ -134,10 +148,8 @@ def main():
         lr=1e-5,
     )
 
-    print("Initializing GPTTrainer...")
     model_peft = GPTTrainer.init_from_config(config)
     
-    print("Applying LoRA...")
     peft_config = LoraConfig(
         inference_mode=False,
         r=8,
@@ -146,6 +158,7 @@ def main():
         target_modules=["c_attn", "c_proj", "c_fc"],
     )
     model_peft.xtts.gpt = get_peft_model(model_peft.xtts.gpt, peft_config)
+    trainable_params, _ = model_peft.xtts.gpt.get_nb_trainable_parameters()
 
     trainer_args = TrainerArgs(
         restore_path=None,
@@ -163,13 +176,28 @@ def main():
         eval_samples=eval_samples,
     )
 
-    print("Starting training... 🚀")
     trainer.fit()
 
-    print("Saving LoRA adapter...")
     os.makedirs(LORA_ADAPTER_PATH, exist_ok=True)
     model_peft.xtts.gpt.save_pretrained(str(LORA_ADAPTER_PATH))
     config.save_json(str(XTTS_LORA_ORIGINAL_CONFIG_PATH))
+
+    # レポート用の統計情報を収集
+    end_time = time.time()
+    duration = end_time - start_time
+    stats = {
+        "duration": f"{duration:.2f} seconds",
+        "epochs": args.epochs,
+        "batch_size": config.batch_size,
+        "train_samples": len(train_samples),
+        "eval_samples": len(eval_samples),
+        "trainable_params": trainable_params,
+        "lora_path": str(LORA_ADAPTER_PATH),
+        "config_path": str(XTTS_LORA_ORIGINAL_CONFIG_PATH),
+        "dataset_path": args.dataset_path
+    }
+    
+    generate_report(OUTPUT_ROOT_DIR, stats)
     print(f"Success! LoRA saved to {LORA_ADAPTER_PATH}")
 
 if __name__ == "__main__":
