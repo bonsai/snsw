@@ -36,9 +36,16 @@ def run_command(cmd, description):
 
 def main():
     try:
-        logger.info("=== SNSW Kaggle One-Click Training Pipeline (YouTube Source) Started ===")
+        logger.info("=== SNSW Kaggle One-Click Training Pipeline (Python 3.12 Fix) Started ===")
         
-        run_command("pip install -U TTS peft transformers datasets safetensors librosa yt-dlp faster-whisper", "Installing libraries")
+        logger.info("Adjusting installation for Python 3.12 compatibility...")
+        run_command("pip install --no-cache-dir transformers==4.35.2 datasets peft safetensors librosa yt-dlp faster-whisper", "Installing base libraries")
+        
+        try:
+            run_command("pip install --no-cache-dir coqui-tts", "Installing coqui-tts")
+        except:
+            logger.warning("Standard TTS install failed, trying alternative...")
+            run_command("pip install --no-cache-dir git+https://github.com/coqui-ai/TTS.git", "Installing TTS from source")
         
         YOUTUBE_URL = "https://www.youtube.com/watch?v=pw5nR3ym8XA"
         RAW_DIR = "/kaggle/working/data/raw"
@@ -50,13 +57,13 @@ def main():
         WAV_DIR = "/kaggle/working/data/wav"
         os.makedirs(WAV_DIR, exist_ok=True)
         run_command(f"ffmpeg -i {RAW_DIR}/input.wav -ar 22050 -ac 1 {WAV_DIR}/processed.wav -y", "Converting Audio")
-
         run_command(f"ffmpeg -i {WAV_DIR}/processed.wav -ss 0 -t 60 {WAV_DIR}/sample.wav -y", "Creating 60s sample")
         
         metadata_path = "/kaggle/working/data/metadata.csv"
         with open(metadata_path, "w") as f:
             f.write("sample.wav|えー、お馴染みの一席でございます。志ん生でございます。|shinsho\n")
         
+        logger.info("Starting LoRA training...")
         run_command(f"python train_xtts_lora.py --dataset_path {metadata_path} --epochs 1", "Running LoRA Training")
         
         logger.info("=== Pipeline Completed Successfully! ===")
