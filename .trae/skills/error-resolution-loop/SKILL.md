@@ -25,15 +25,23 @@ python .trae/skills/error-resolution-loop/healer.py -- <your_command_here>
     *   **Apply Fix**: Modify the code to resolve the issue.
     *   **Loop**: Re-run the command using the healer script until success.
 
-## Example
+## Examples
 
+### Basic Python Script
 ```bash
 python .trae/skills/error-resolution-loop/healer.py -- pytest tests/test_audio.py
 ```
 
+### Jupyter Notebook (CI/CD)
+Executes a notebook headlessly and captures cell errors (requires `nbconvert` and `ipykernel`).
+
+```bash
+# Execute notebook and convert to python script (useful for debugging) or just execute in place
+python .trae/skills/error-resolution-loop/healer.py -- jupyter nbconvert --to notebook --execute --inplace my_notebook.ipynb
+```
+
 If it fails:
-1.  Check the output for the log file path.
-2.  Read the log.
-3.  Propose a fix.
-4.  Apply the fix.
-5.  Run the command again.
+1.  The `healer.py` will detect `CellExecutionError`.
+2.  Check the log for the specific cell and traceback.
+3.  Fix the notebook cell code.
+4.  Re-run.
