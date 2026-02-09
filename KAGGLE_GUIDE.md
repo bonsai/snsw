@@ -20,7 +20,7 @@ import os
 import subprocess
 
 # セットアップスクリプトの取得と実行
-!curl -O https://raw.githubusercontent.com/bonsai/snsw/main/kaggle_setup.py
+!curl -O https://raw.githubusercontent.com/bonsai/snsw/<COMMIT_HASH_OR_TAG>/kaggle_setup.py
 import kaggle_setup
 kaggle_setup.install_dependencies()
 kaggle_setup.setup_project()
