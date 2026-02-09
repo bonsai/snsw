@@ -69,7 +69,7 @@ def main():
             transcript = "".join(segment.text for segment in segments).strip()
             with open(metadata_path, "w") as f:
                 f.write(f"sample.wav|{transcript}|shinsho\n")
-        except:
+        except Exception as e:
             with open(metadata_path, "w") as f:
                 f.write("sample.wav|えー、お馴染みの一席でございます。|shinsho\n")
 
