@@ -47,7 +47,7 @@ def main():
         run_command("pip install --no-cache-dir transformers==4.35.2 datasets peft safetensors librosa yt-dlp faster-whisper", "Installing base libraries")
         try:
             run_command("pip install --no-cache-dir coqui-tts", "Installing coqui-tts")
-        except:
+        except subprocess.CalledProcessError:
             run_command("pip install --no-cache-dir git+https://github.com/coqui-ai/TTS.git", "Installing TTS from source")
         
         RAW_DIR = os.path.join(DATA_BASE, "raw")
