@@ -73,9 +73,9 @@ def main():
             with open(metadata_path, "w") as f:
                 f.write("sample.wav|えー、お馴染みの一席でございます。|shinsho\n")
 
-        train_script = os.path.join(BASE_DIR, "train_xtts_lora.py")
+        train_script = os.path.join(BASE_DIR, "src", "lora", "train_xtts.py")
         if not os.path.exists(train_script):
-            train_script = os.path.abspath("train_xtts_lora.py")
+            train_script = os.path.abspath(os.path.join("src", "lora", "train_xtts.py"))
             
         run_command(f"python {train_script} --dataset_path {metadata_path} --epochs 1", "Running LoRA Training")
         
