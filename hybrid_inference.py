@@ -26,9 +26,9 @@ def run_rvc(input_wav, output_wav, rvc_model_path, f0_up_key=0):
         print(f"Warning: RVC script not found at {rvc_script}. Skipping RVC step.")
         return input_wav
 
-    cmd = f"python {rvc_script} --model {rvc_model_path} --input {input_wav} --output {output_wav} --f0_up_key {f0_up_key}"
-    print(f"Running RVC: {cmd}")
-    os.system(cmd)
+    cmd_list = ["python", rvc_script, "--model", rvc_model_path, "--input", input_wav, "--output", output_wav, "--f0_up_key", str(f0_up_key)]
+    print(f"Running RVC: {' '.join(cmd_list)}")
+    subprocess.run(cmd_list, check=True)
     return output_wav
 
 def main():
