@@ -56,6 +56,10 @@ Kaggle の GPU を使用して XTTS-v2 の LoRA 学習を行う手順です。
 
 ### 2. 学習スクリプトの実行
 
+**注意:** `train_xtts_lora.py` はLoRA学習のテンプレートです。実際の学習ループは実装されていません。使用する前に、スクリプトを編集して学習処理を実装する必要があります。
+
+学習処理を実装した後、以下のコマンドでスクリプトを実行します。
+
 ```python
 !python train_xtts_lora.py \
     --dataset_path "/kaggle/input/your-dataset-name/metadata.csv" \
