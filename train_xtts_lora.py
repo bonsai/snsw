@@ -2,8 +2,8 @@ import os
 import torch
 import argparse
 from TTS.api import TTS
-from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
-from transformers import Trainer, TrainingArguments, DataCollatorWithPadding
+from peft import LoraConfig, get_peft_model
+from transformers import Trainer, TrainingArguments
 from datasets import load_dataset
 
 def train(args):
