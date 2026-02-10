@@ -24,8 +24,25 @@ def setup_logging():
             logging.FileHandler(log_file),
             logging.StreamHandler(sys.stdout)
         ]
-    )
+ # Line 27付近の依存関係インストール部分
+        run_command("pip install --no-cache-dir transformers==4.35.2 datasets peft safetensors librosa yt-dlp", 
+                "Installing base libraries")
+
+# faster-whisperを別途インストール
+        run_command("pip install --no-cache-dir faster-whisper", "Installing faster-whisper")
+
+# Coqui TTSのインストール - より堅牢に
+        try:
+            run_command("pip install --no-cache-dir TTS", "Installing TTS")
+        except Exception as e:
+            logger.warning(f"Standard 'TTS' install failed: {e}. Trying from source.")
+            run_command("pip install --no-cache-dir git+https://github.com/coqui-ai/TTS.git@dev", 
+                        "Installing TTS from source")
+    
     return logging.getLogger(__name__)
+
+
+
 
 logger = setup_logging()
 
