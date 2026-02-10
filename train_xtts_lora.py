@@ -7,11 +7,9 @@ from transformers import Trainer, TrainingArguments
 from datasets import load_dataset
 
 def train(args):
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    
     # 1. モデルのロード
     print(f"Loading base model: {args.model_name}")
-    tts = TTS(args.model_name).to(device)
+    tts = TTS(args.model_name, gpu=torch.cuda.is_available())
     model = tts.model.gpt # XTTSのGPT部分を抽出
     
     # 2. LoRA設定
