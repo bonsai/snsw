@@ -5,7 +5,9 @@ import logging
 import datetime
 import traceback
 import shutil
+import torch
 
+# Kaggle base directories
 BASE_DIR = "/kaggle/working/snsw"
 DATA_BASE = "/kaggle/working/data"
 LOG_DIR = os.path.join(BASE_DIR, "dev")
@@ -42,40 +44,54 @@ def run_command(cmd, description, cwd=None):
 
 def main():
     try:
-        logger.info("=== SNSW Kaggle One-Click Training Pipeline (Absolute Path Fix) Started ===")
+        logger.info("=== SNSW Kaggle One-Click Training Pipeline (Robust Edition) Started ===")
         
+        # 1. Install dependencies
         run_command("pip install --no-cache-dir transformers==4.35.2 datasets peft safetensors librosa yt-dlp faster-whisper", "Installing base libraries")
         try:
             run_command("pip install --no-cache-dir coqui-tts", "Installing coqui-tts")
-        except subprocess.CalledProcessError:
+        except Exception as e:
+            logger.warning(f"Standard 'coqui-tts' install failed: {e}. Trying to install from source.")
             run_command("pip install --no-cache-dir git+https://github.com/coqui-ai/TTS.git", "Installing TTS from source")
         
+        # 2. Prepare directories
         RAW_DIR = os.path.join(DATA_BASE, "raw")
         WAV_DIR = os.path.join(DATA_BASE, "wav")
         os.makedirs(RAW_DIR, exist_ok=True)
         os.makedirs(WAV_DIR, exist_ok=True)
         
+        # 3. Download source from YouTube
         YOUTUBE_URL = "https://www.youtube.com/watch?v=pw5nR3ym8XA"
         run_command(f'yt-dlp -x --audio-format wav --audio-quality 0 -o "{RAW_DIR}/input.%(ext)s" {YOUTUBE_URL}', "Downloading Audio")
         
+        # 4. Preprocess Audio
         run_command(f"ffmpeg -i {RAW_DIR}/input.wav -ar 22050 -ac 1 {WAV_DIR}/processed.wav -y", "Converting Audio")
         run_command(f"ffmpeg -i {WAV_DIR}/processed.wav -ss 0 -t 60 {WAV_DIR}/sample.wav -y", "Creating 60s sample")
         
+        # 5. Auto-transcription with faster-whisper
         metadata_path = os.path.join(DATA_BASE, "metadata.csv")
         try:
             from faster_whisper import WhisperModel
-            model = WhisperModel("base", device="cuda", compute_type="float16")
+            device = "cuda" if torch.cuda.is_available() else "cpu"
+            compute_type = "float16" if device == "cuda" else "int8"
+            
+            logger.info(f"Loading Whisper model (device={device}, compute_type={compute_type})...")
+            model = WhisperModel("base", device=device, compute_type=compute_type)
             segments, _ = model.transcribe(os.path.join(WAV_DIR, "sample.wav"), language="ja")
             transcript = "".join(segment.text for segment in segments).strip()
+            
             with open(metadata_path, "w") as f:
                 f.write(f"sample.wav|{transcript}|shinsho\n")
+            logger.info(f"Transcription completed: {transcript[:50]}...")
         except Exception as e:
+            logger.warning(f"Whisper transcription failed, falling back to default text. Error: {e}")
             with open(metadata_path, "w") as f:
-                f.write("sample.wav|えー、お馴染みの一席でございます。|shinsho\n")
+                f.write("sample.wav|えー、お馴染みの一席でございます。志ん生でございます。|shinsho\n")
 
-        train_script = os.path.join(BASE_DIR, "src", "lora", "train_xtts.py")
+        # 6. Run LoRA Training
+        train_script = os.path.join(BASE_DIR, "src/lora/train_xtts.py")
         if not os.path.exists(train_script):
-            train_script = os.path.abspath(os.path.join("src", "lora", "train_xtts.py"))
+            train_script = os.path.abspath("src/lora/train_xtts.py")
             
         run_command(f"python {train_script} --dataset_path {metadata_path} --epochs 1", "Running LoRA Training")
         
