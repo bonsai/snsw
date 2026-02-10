@@ -54,18 +54,15 @@ def train(args):
     
     # 5. トレーナーの初期化と実行
     # 注: XTTS独自のLoss計算が必要なため、通常はカスタムTrainerを使用します
-    print("Starting training...")
-    # trainer = Trainer(
-    #     model=model,
-    #     args=training_args,
-    #     train_dataset=dataset["train"],
-    # )
-    # trainer.train()
-    
-    # 6. LoRA重みの保存
-    os.makedirs(args.output_dir, exist_ok=True)
-    model.save_pretrained(os.path.join(args.output_dir, "lora_weights"))
-    print(f"LoRA weights saved to {args.output_dir}/lora_weights")
+    print("[WARNING] Training loop not implemented. Aborting to prevent saving untrained weights.")
+    raise NotImplementedError(
+        "Training logic is not implemented. Please complete the script before running."
+    )
+
+    # 6. LoRA重みの保存 (学習処理を実装した後に有効化してください)
+    # os.makedirs(args.output_dir, exist_ok=True)
+    # model.save_pretrained(os.path.join(args.output_dir, "lora_weights"))
+    # print(f"LoRA weights saved to {args.output_dir}/lora_weights")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
