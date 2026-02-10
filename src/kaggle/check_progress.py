@@ -25,7 +25,8 @@ def check_progress():
         print("="*40)
         print(f"Current Phase: {phase}")
         print(f"Status:        {status}")
-        print(f"Overall:       [{'#' * (progress // 5)}{'.' * (20 - progress // 5)}] {progress}%")
+        bar_fill = min(20, max(0, progress // 5))
+        print(f"Overall:       [{'#' * bar_fill}{'.' * (20 - bar_fill)}] {progress}%")
         
         if metrics:
             print("-" * 40)
