@@ -36,6 +36,6 @@ docker-compose run snsw-ai --text "えー、お馴染みの一席でございま
 ```powershell
 docker-compose run snsw-ai `
     --text "志ん生でございます。" `
-    --speaker_wav "data/ref.wav" `
-    --output "outputs/final.wav"
+    --speaker_wav "data/ref_shinsho.wav" `
+    --output "outputs/docker_out.wav"
 ```
