@@ -17,14 +17,24 @@ if str(current_dir) not in sys.path:
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.append(str(PROJECT_ROOT))
 
+# Import required libraries with proper error handling
 try:
-    from trainer import Trainer, TrainerArgs
     from TTS.config.shared_configs import BaseDatasetConfig
     from TTS.tts.datasets import load_tts_samples
-    from TTS.tts.layers.xtts.trainer.gpt_trainer import GPTArgs, GPTTrainer, GPTTrainerConfig, XttsAudioConfig
+    from TTS.tts.layers.xtts.trainer.gpt_trainer import (
+        GPTArgs, 
+        GPTTrainer, 
+        GPTTrainerConfig, 
+        XttsAudioConfig
+    )
+    from TTS.trainer import Trainer, TrainerArgs
     from peft import LoraConfig, get_peft_model
+    import torch
 except ImportError as e:
-    print(f"Error importing libraries: {e}")
+    print(f"Critical import error: {e}")
+    print("\nPlease ensure all dependencies are installed:")
+    print("  pip install TTS peft transformers torch")
+    sys.exit(1)
 
 def generate_report(output_dir, stats):
     """学習結果のレポートを生成する"""
@@ -65,10 +75,12 @@ Generated at: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 def main():
     start_time = time.time()
     parser = argparse.ArgumentParser(description="XTTS LoRA Training for Kaggle")
-    parser.add_argument("--dataset_path", type=str, default=str(DATA_ROOT / "metadata.csv"), help="Path to metadata.csv")
+    parser.add_argument("--dataset_path", type=str, default=str(DATA_ROOT / "metadata.csv"), 
+                       help="Path to metadata.csv")
     parser.add_argument("--epochs", type=int, default=1, help="Number of training epochs")
     args = parser.parse_args()
 
+    # Directory setup
     PRETRAINED_MODEL_ROOT = PROJECT_ROOT / "pretrained_model"
     if not PRETRAINED_MODEL_ROOT.exists():
         PRETRAINED_MODEL_ROOT = current_dir / "pretrained_model"
@@ -77,6 +89,7 @@ def main():
     SPEAKER_REFERENCE_ROOT = PROJECT_ROOT / "speaker_reference"
     OUTPUT_ROOT_DIR = PROJECT_ROOT / "training_output"
 
+    # Model file paths
     XTTS_MEL_PATH = PRETRAINED_MODEL_ROOT / "mel_stats.pth"
     XTTS_DVAE_PATH = PRETRAINED_MODEL_ROOT / "dvae.pth"
     XTTS_MODEL_PATH = PRETRAINED_MODEL_ROOT / "model.pth"
@@ -90,6 +103,7 @@ def main():
     LORA_ADAPTER_PATH = OUTPUT_PATH / "lora_adapter"
     XTTS_LORA_ORIGINAL_CONFIG_PATH = LORA_ADAPTER_PATH / "original_xtts_config.json"
 
+    # Dataset configuration
     config_dataset = BaseDatasetConfig(
         formatter="ljspeech",
         dataset_name="ljspeech",
@@ -106,6 +120,7 @@ def main():
         eval_split_size=0.05,
     )
 
+    # Model arguments
     model_args = GPTArgs(
         max_conditioning_length=132300,
         min_conditioning_length=66150,
@@ -123,12 +138,14 @@ def main():
         gpt_use_perceiver_resampler=True,
     )
 
+    # Audio configuration
     audio_config = XttsAudioConfig(
         sample_rate=22050,
         dvae_sample_rate=22050,
         output_sample_rate=24000
     )
 
+    # Training configuration
     config = GPTTrainerConfig(
         output_path=str(OUTPUT_PATH),
         model_args=model_args,
@@ -148,8 +165,10 @@ def main():
         lr=1e-5,
     )
 
+    # Initialize model
     model_peft = GPTTrainer.init_from_config(config)
     
+    # Apply LoRA
     peft_config = LoraConfig(
         inference_mode=False,
         r=8,
@@ -160,6 +179,7 @@ def main():
     model_peft.xtts.gpt = get_peft_model(model_peft.xtts.gpt, peft_config)
     trainable_params, _ = model_peft.xtts.gpt.get_nb_trainable_parameters()
 
+    # Trainer arguments
     trainer_args = TrainerArgs(
         restore_path=None,
         skip_train_epoch=False,
@@ -167,6 +187,7 @@ def main():
         grad_accum_steps=64,
     )
     
+    # Create trainer and start training
     trainer = Trainer(
         args=trainer_args,
         config=config,
@@ -178,11 +199,12 @@ def main():
 
     trainer.fit()
 
+    # Save LoRA adapter
     os.makedirs(LORA_ADAPTER_PATH, exist_ok=True)
     model_peft.xtts.gpt.save_pretrained(str(LORA_ADAPTER_PATH))
     config.save_json(str(XTTS_LORA_ORIGINAL_CONFIG_PATH))
 
-    # レポート用の統計情報を収集
+    # Generate report
     end_time = time.time()
     duration = end_time - start_time
     stats = {
