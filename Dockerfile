@@ -21,8 +21,8 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # 依存ライブラリのインストール
-# キャッシュ効率化のため、まず pyproject.toml だけコピーしてインストール
-COPY pyproject.toml .
+# キャッシュ効率化のため、まず pyproject.toml と README.md だけコピーしてインストール
+COPY pyproject.toml README.md ./
 RUN pip install --no-cache-dir .
 
 # XTTS-v2, RVC関連のライブラリをインストール

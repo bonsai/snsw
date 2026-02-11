@@ -4,7 +4,7 @@ services:
     container_name: snsw-ai-container
     volumes:
       - .:/app
-      - snsw-models:/root/.cache
+      - C:\MODELS:/root/.cache
       - ./tts_outputs:/app/tts_outputs
       - ./data:/app/data
       - ./dev:/app/dev
@@ -18,8 +18,6 @@ services:
     environment:
       - CUDA_VISIBLE_DEVICES=0
       - KAGGLE_ENVIRONMENT=0
+      - TORCH_HOME=/root/.cache/torch
     tty: true
     stdin_open: true
-
-volumes:
-  snsw-models:
