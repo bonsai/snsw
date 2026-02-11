@@ -47,7 +47,7 @@ def main():
             
             try:
                 run_command("pip install --no-cache-dir TTS", "Installing TTS")
-            except:
+            except subprocess.CalledProcessError:
                 logger.warning("Standard TTS install failed, trying alternative...")
                 run_command("pip install --no-cache-dir git+https://github.com/coqui-ai/TTS.git", "Installing TTS from source")
         else:
