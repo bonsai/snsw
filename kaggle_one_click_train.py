@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 def run_command(cmd, description):
     logger.info(f"Starting: {description}")
     try:
-        result = subprocess.run(cmd, shell=True, check=True, capture_output=True, text=True)
+        result = subprocess.run(shlex.split(cmd), check=True, capture_output=True, text=True)
         logger.info(f"Successfully completed: {description}")
         return result.stdout
     except subprocess.CalledProcessError as e:
