@@ -6,8 +6,6 @@ services:
       - .:/app
       - snsw-models:/root/.cache
       - ./tts_outputs:/app/tts_outputs
-      - ./data:/app/data
-      - ./dev:/app/dev
     deploy:
       resources:
         reservations:
@@ -17,7 +15,7 @@ services:
               capabilities: [gpu]
     environment:
       - CUDA_VISIBLE_DEVICES=0
-      - KAGGLE_ENVIRONMENT=0
+      - KAGGLE_ENVIRONMENT=0  # Docker環境であることを示す
     tty: true
     stdin_open: true
 
