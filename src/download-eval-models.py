@@ -13,11 +13,19 @@ def run_command(command):
 def download_nisqa():
     """NISQA (自然さ・品質評価モデル) のダウンロード"""
     print("\n--- NISQA モデルのダウンロード ---")
-    # NISQAはGitHubリポジトリからウェイトをダウンロードすることが多いが、
-    # ここではHugging Face上の類似モデルや、リポジトリのクローンを想定
-    repo_id = "vinesmsuic/nisqa-v2" # 例としてのHugging Face Repo
+    # vinesmsuic/nisqa-v2 はプライベートまたは存在しない可能性があるため、
+    # 公開されている代替リポジトリまたは直接URLを検討。
+    # ここでは一般的な品質評価モデルの代替案として、公開されている構成を試みる。
+    # ユーザーが明示的に vinesmsuic/nisqa-v2 を指定した場合は HF_TOKEN が必要。
+    repo_id = "vinesmsuic/NISQA" # 正しいリポジトリ名を確認
     local_dir = "C:/models/eval/nisqa"
-    run_command(f"huggingface-cli download {repo_id} --local-dir {local_dir}")
+    
+    # トークンがある場合はそれを使用する環境変数を確認
+    token_cmd = ""
+    if os.getenv("HF_TOKEN"):
+        token_cmd = f" --token {os.getenv('HF_TOKEN')}"
+        
+    run_command(f"huggingface-cli download {repo_id} --local-dir {local_dir}{token_cmd}")
 
 def download_resemblyzer():
     """Resemblyzer (話者類似度評価モデル) のダウンロード"""
