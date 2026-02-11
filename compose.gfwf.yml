@@ -1,0 +1,22 @@
+services:
+  snsw-ai:
+    build: .
+    container_name: gfwf-container
+    volumes:
+      # GitHub Actionsのワーキングディレクトリをマウント
+      - .:/app
+      # モデルデータのキャッシュ（Artifactsや外部ストレージとの連携用）
+      - ./models:/app/models
+      - ./models/.cache:/root/.cache
+      - ./models/.local:/root/.local
+      # 出力先
+      - ./tts_outputs:/app/tts_outputs
+    environment:
+      - KAGGLE_ENVIRONMENT=0
+      - TORCH_HOME=/root/.cache/torch
+      - HF_HOME=/root/.cache/huggingface
+      - TRANSFORMERS_CACHE=/root/.cache/huggingface/transformers
+      - XDG_CACHE_HOME=/root/.cache
+      - COQUI_TOS_AGREED=1
+    tty: true
+    stdin_open: true
