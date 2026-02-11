@@ -70,7 +70,7 @@ def main():
         try:
             from faster_whisper import WhisperModel
             model_size = "base"
-            device = "cuda" if subprocess.run("nvidia-smi", shell=True).returncode == 0 else "cpu"
+            device = "cuda" if __import__('torch').cuda.is_available() else "cpu"
             logger.info(f"Loading Whisper model '{model_size}' on {device}...")
             
             whisper_model = WhisperModel(model_size, device=device, compute_type="float16" if device == "cuda" else "int8")
