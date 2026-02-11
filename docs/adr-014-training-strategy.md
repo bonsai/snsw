@@ -44,4 +44,4 @@ MODELS/trained/
 - **複雑性**: 複数の学習手法（LoRA, Full FT, RVC）を併用するため、習得コストが高い。
 
 ## 5. 補足
-本戦略は、[mlops.yml](file:///c:/Users/dance/zone/snsw/.github/workflows/mlops.yml) における `train-common-run.py` の実行ロジックの指針となる。
+本戦略は、[mlops.yml](../.github/workflows/mlops.yml) における `train-common-run.py` の実行ロジックの指針となる。
