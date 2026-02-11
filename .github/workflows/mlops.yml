@@ -1,0 +1,41 @@
+name: SNSW ML-Ops Loop
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  ml-ops-loop:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build and Run Generation-Eval-Train Loop
+      run: |
+        # Docker Compose を使用して環境を立ち上げ、一連のループを実行
+        # 注意: GitHub Actions の無料枠では GPU が使えないため、CPU/エミュレーション動作を想定
+        
+        # 1. 環境構築 (ビルド)
+        docker compose -f docker-compose.cpu.yml build
+        
+        # 2. 生成 (TTS Generation)
+        echo "Starting TTS Generation..."
+        docker compose -f docker-compose.cpu.yml run --rm tts-app python src/tts-multi-selector.py
+        
+        # 3. 評価 (Evaluation)
+        echo "Starting Audio Evaluation..."
+        docker compose -f docker-compose.cpu.yml run --rm tts-app python src/eval-batch-stats.py
+        
+        # 4. 学習 (Training - Mock/Dry-run for CI)
+        echo "Starting Model Training (Dry-run)..."
+        docker compose -f docker-compose.cpu.yml run --rm tts-app python src/train-common-run.py --dry-run
+
+    - name: Upload Evaluation Reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: evaluation-reports
+        path: tts_outputs/report_*.md

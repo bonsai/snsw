@@ -22,6 +22,8 @@
   - 評価スコアに応じた改善アクションの定義。
 - **[ADR-009: スキルの定義と拡張](adr-009-skill-definition.md)**
   - システムが実行可能な具体的なスキル（wav2mp3等）の定義。
-- **[ADR-010: モデル評価基準と学習継続・見切りの判断指針](adr-010-model-evaluation-criteria.md)**
+- **[ADR-010: 音声評価基準の策定 (3段階ティア)](adr-010-model-evaluation-criteria.md)**
 - **[ADR-011: TTSモデル選定と複数モデル共存環境の構築](adr-011-tts-model-selection.md)**
 - **[ADR-012: 音声品質の自動採点システムの導入](adr-012-audio-scoring.md)**
+- **[ADR-013: 学習データセットの構造化と自動前処理パイプライン](adr-013-dataset-pipeline.md)**
+- **[ADR-014: 追加学習（Fine-tuning）の実行戦略とモデル保存](adr-014-training-strategy.md)**
