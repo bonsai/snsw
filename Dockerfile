@@ -23,11 +23,15 @@ WORKDIR /app
 # 依存ライブラリのインストール
 # キャッシュ効率化のため、まず pyproject.toml と README.md だけコピーしてインストール
 COPY pyproject.toml README.md ./
+COPY src/ ./src/
 RUN pip install --no-cache-dir .
 
 # XTTS-v2, RVC関連のライブラリをインストール
 RUN pip install --no-cache-dir \
     TTS \
+    cutlet \
+    mecab-python3 \
+    unidic-lite \
     peft \
     transformers==4.35.2 \
     datasets \

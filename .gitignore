@@ -25,6 +25,10 @@ Thumbs.db
 # Project-generated data
 runs/
 outputs/
+OUTPUTS/
+tts_outputs/
+SOURCE/
+ARCHIVE/
 data/
 datasets/
 models/

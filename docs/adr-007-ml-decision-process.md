@@ -1,4 +1,4 @@
-# Machine Learning Decision Record (MLDR)
+# ADR-007: Machine Learning Decision Record (MLDR)
 
 このドキュメントでは、志ん生音声再現モデルの進化（学習）の過程を記録します。
 

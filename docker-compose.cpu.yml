@@ -1,8 +1,6 @@
 services:
   snsw-ai:
-    build:
-      context: .
-      dockerfile: Dockerfile.optimized
+    build: .
     container_name: snsw-ai-container
     volumes:
       # ソースコードのマウント
@@ -16,16 +14,13 @@ services:
       - ./tts_outputs:/app/tts_outputs
       - ./data:/app/data
       - ./dev:/app/dev
-    # devices:
-    #   - /dev/kfd:/dev/kfd
-    #   - /dev/dri:/dev/dri
     environment:
       - KAGGLE_ENVIRONMENT=0
-      - HSA_OVERRIDE_GFX_VERSION=10.3.0
       # モデルキャッシュの場所を明示的に指定
       - TORCH_HOME=/root/.cache/torch
       - HF_HOME=/root/.cache/huggingface
       - TRANSFORMERS_CACHE=/root/.cache/huggingface/transformers
       - XDG_CACHE_HOME=/root/.cache
+      - COQUI_TOS_AGREED=1
     tty: true
     stdin_open: true

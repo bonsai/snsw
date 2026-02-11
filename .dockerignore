@@ -1,0 +1,102 @@
+# Python cache and build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation and non-essential files
+docs/
+*.md
+!README.md
+LICENSE
+.github/
+
+# Test files
+tests/
+test_*.py
+*_test.py
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Outputs and temporary files
+OUTPUTS/
+outputs/
+*.log
+*.tmp
+temp/
+tmp/
+
+# Archive and source materials (not needed in container)
+ARCHIVE/
+SOURCE/
+
+# Development and planning files
+plan/
+dev/
+.dev/
+
+# Docker files (don't copy into image)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Models (should be mounted or downloaded at runtime)
+models/
+*.pth
+*.pt
+*.safetensors
+*.ckpt
+
+# Data files (should be mounted)
+data/
+*.wav
+*.mp3
+*.flac
+
+# Jupyter notebooks
+*.ipynb
+.ipynb_checkpoints/
+
+# Environment files
+.env
+.env.*
