@@ -9,7 +9,7 @@
 ## 3. 決定事項
 
 ### 3.1 学習のトリガー
-[eval-batch-stats.py](file:///c:/Users/dance/zone/snsw/src/eval-batch-stats.py) のレポートに基づき、以下の基準で学習を実行する。
+[eval-batch-stats.py](../src/eval-batch-stats.py) のレポートに基づき、以下の基準で学習を実行する。
 - **話者類似度スコア < 0.7**: 優先的に Fine-tuning (LoRA等) を実施。
 - **MOSスコア < 3.0**: データセットのクリーニング後に学習率を下げて再学習。
 
