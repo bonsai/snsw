@@ -57,7 +57,7 @@ jobs:
         "
 
     - name: Upload Artifacts (Fallback)
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: tts-wav-outputs
         path: tts_outputs/*.wav

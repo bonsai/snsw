@@ -35,7 +35,7 @@ jobs:
         docker compose -f docker-compose.cpu.yml run --rm tts-app python src/train-common-run.py --dry-run
 
     - name: Upload Evaluation Reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: evaluation-reports
         path: tts_outputs/report_*.md
