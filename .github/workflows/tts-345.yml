@@ -12,10 +12,10 @@ jobs:
   tts-generation:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      uses: docker/setup-buildx-action@v3
 
     - name: Build and Run TTS Models
       run: |
@@ -23,13 +23,13 @@ jobs:
         docker compose -f docker-compose.cpu.yml build
         
         echo "Starting Model 3: GPT-SoVITS..."
-        docker compose -f docker-compose.cpu.yml run --rm -e TTS_MODEL=3 -e TTS_TEXT="${{ github.event.inputs.text }}" tts-app python src/tts-multi-selector.py
+        docker compose -f docker-compose.cpu.yml run --rm -e TTS_MODEL=3 -e TTS_TEXT="${{ github.event.inputs.text }}" snsw-ai python src/tts-multi-selector.py
         
         echo "Starting Model 4: Fish-Speech..."
-        docker compose -f docker-compose.cpu.yml run --rm -e TTS_MODEL=4 -e TTS_TEXT="${{ github.event.inputs.text }}" tts-app python src/tts-multi-selector.py
+        docker compose -f docker-compose.cpu.yml run --rm -e TTS_MODEL=4 -e TTS_TEXT="${{ github.event.inputs.text }}" snsw-ai python src/tts-multi-selector.py
         
         echo "Starting Model 5: StyleTTS2..."
-        docker compose -f docker-compose.cpu.yml run --rm -e TTS_MODEL=5 -e TTS_TEXT="${{ github.event.inputs.text }}" tts-app python src/tts-multi-selector.py
+        docker compose -f docker-compose.cpu.yml run --rm -e TTS_MODEL=5 -e TTS_TEXT="${{ github.event.inputs.text }}" snsw-ai python src/tts-multi-selector.py
 
     - name: Upload to Hugging Face (ghfs)
       env:

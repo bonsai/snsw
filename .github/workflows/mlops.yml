@@ -9,10 +9,10 @@ jobs:
   ml-ops-loop:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      uses: docker/setup-buildx-action@v3
 
     - name: Build and Run Generation-Eval-Train Loop
       run: |
@@ -24,15 +24,15 @@ jobs:
         
         # 2. 生成 (TTS Generation)
         echo "Starting TTS Generation..."
-        docker compose -f docker-compose.cpu.yml run --rm tts-app python src/tts-multi-selector.py
+        docker compose -f docker-compose.cpu.yml run --rm snsw-ai python src/tts-multi-selector.py
         
         # 3. 評価 (Evaluation)
         echo "Starting Audio Evaluation..."
-        docker compose -f docker-compose.cpu.yml run --rm tts-app python src/eval-batch-stats.py
+        docker compose -f docker-compose.cpu.yml run --rm snsw-ai python src/eval-batch-stats.py
         
         # 4. 学習 (Training - Mock/Dry-run for CI)
         echo "Starting Model Training (Dry-run)..."
-        docker compose -f docker-compose.cpu.yml run --rm tts-app python src/train-common-run.py --dry-run
+        docker compose -f docker-compose.cpu.yml run --rm snsw-ai python src/train-common-run.py --dry-run
 
     - name: Upload Evaluation Reports
       uses: actions/upload-artifact@v4
