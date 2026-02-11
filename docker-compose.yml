@@ -1,0 +1,23 @@
+services:
+  snsw-ai:
+    build: .
+    container_name: snsw-ai-container
+    volumes:
+      - .:/app
+      - snsw-models:/root/.cache
+      - ./tts_outputs:/app/tts_outputs
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - KAGGLE_ENVIRONMENT=0  # Docker環境であることを示す
+    tty: true
+    stdin_open: true
+
+volumes:
+  snsw-models:

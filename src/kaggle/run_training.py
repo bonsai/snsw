@@ -24,20 +24,24 @@ def setup_logging():
             logging.FileHandler(log_file),
             logging.StreamHandler(sys.stdout)
         ]
- # Line 27付近の依存関係インストール部分
+ # Docker環境や既にインストール済みの環境ではスキップできるようにする
+    if not os.environ.get("KAGGLE_ENVIRONMENT") == "0":
+        logger.info("Installing dependencies (Non-Docker environment detected)")
         run_command("pip install --no-cache-dir transformers==4.35.2 datasets peft safetensors librosa yt-dlp", 
                 "Installing base libraries")
 
-# faster-whisperを別途インストール
+        # faster-whisperを別途インストール
         run_command("pip install --no-cache-dir faster-whisper", "Installing faster-whisper")
 
-# Coqui TTSのインストール - より堅牢に
+        # Coqui TTSのインストール - より堅牢に
         try:
             run_command("pip install --no-cache-dir TTS", "Installing TTS")
         except Exception as e:
             logger.warning(f"Standard 'TTS' install failed: {e}. Trying from source.")
             run_command("pip install --no-cache-dir git+https://github.com/coqui-ai/TTS.git@dev", 
                         "Installing TTS from source")
+    else:
+        logger.info("Skipping dependency installation (Docker environment detected)")
     
     return logging.getLogger(__name__)
 

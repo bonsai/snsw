@@ -1,24 +1,30 @@
-import sys
 import os
+import sys
 import json
 import time
 from pathlib import Path
 import argparse
 from datetime import datetime
 
-# --- Kaggle Environment Path Setup ---
-KAGGLE_WORKING = Path("/kaggle/working")
-PROJECT_ROOT = KAGGLE_WORKING / "snsw"
-DATA_ROOT = KAGGLE_WORKING / "data"
+# --- Environment Path Setup ---
+# Kaggle environment check
+IS_KAGGLE = os.path.exists("/kaggle/working")
+KAGGLE_WORKING = Path("/kaggle/working") if IS_KAGGLE else Path(os.getcwd())
+PROJECT_ROOT = KAGGLE_WORKING / "snsw" if IS_KAGGLE else Path(os.getcwd())
+DATA_ROOT = KAGGLE_WORKING / "data" if IS_KAGGLE else PROJECT_ROOT / "data"
 
+# Add paths to sys.path
 current_dir = Path(__file__).parent.absolute()
-if str(current_dir) not in sys.path:
-    sys.path.append(str(current_dir))
+src_dir = current_dir.parent # src directory
+if str(src_dir) not in sys.path:
+    sys.path.append(str(src_dir))
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.append(str(PROJECT_ROOT))
 
 # Import required libraries with proper error handling
 try:
+    # Ensure TTS is imported before other submodules to avoid potential issues
+    import TTS
     from TTS.config.shared_configs import BaseDatasetConfig
     from TTS.tts.datasets import load_tts_samples
     from TTS.tts.layers.xtts.trainer.gpt_trainer import (
