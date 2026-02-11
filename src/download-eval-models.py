@@ -13,19 +13,13 @@ def run_command(command):
 def download_nisqa():
     """NISQA (自然さ・品質評価モデル) のダウンロード"""
     print("\n--- NISQA モデルのダウンロード ---")
-    # vinesmsuic/nisqa-v2 はプライベートまたは存在しない可能性があるため、
-    # 公開されている代替リポジトリまたは直接URLを検討。
-    # ここでは一般的な品質評価モデルの代替案として、公開されている構成を試みる。
-    # ユーザーが明示的に vinesmsuic/nisqa-v2 を指定した場合は HF_TOKEN が必要。
-    repo_id = "vinesmsuic/NISQA" # 正しいリポジトリ名を確認
-    local_dir = "C:/models/eval/nisqa"
+    # vinesmsuic/NISQA も 401/404 になるため、オリジナルの GitHub リポジトリ等からのダウンロードを推奨。
+    local_dir = Path("C:/models/eval/nisqa")
+    local_dir.mkdir(parents=True, exist_ok=True)
     
-    # トークンがある場合はそれを使用する環境変数を確認
-    token_cmd = ""
-    if os.getenv("HF_TOKEN"):
-        token_cmd = f" --token {os.getenv('HF_TOKEN')}"
-        
-    run_command(f"huggingface-cli download {repo_id} --local-dir {local_dir}{token_cmd}")
+    print("Hugging Face 上のリポジトリにアクセスできないため、GitHub からの手動ダウンロードを検討してください。")
+    print("URL: https://github.com/nhenning/NISQA")
+    print(f"モデルファイルを {local_dir} に配置してください。")
 
 def download_resemblyzer():
     """Resemblyzer (話者類似度評価モデル) のダウンロード"""
@@ -40,9 +34,13 @@ def download_resemblyzer():
 def download_wvmos():
     """Wav2Vec2-based MOS prediction (自然さ予測)"""
     print("\n--- Wav2Vec2-MOS モデルのダウンロード ---")
-    repo_id = "mush42/wvmos"
+    # mush42/wvmos も認証エラーになるため、ライブラリ(wvmos)のインストールで代用
+    print("huggingface-cli でのダウンロードに失敗したため、pip install wvmos を試行します。")
+    run_command("pip install wvmos")
+    
     local_dir = "C:/models/eval/wvmos"
-    run_command(f"huggingface-cli download {repo_id} --local-dir {local_dir}")
+    os.makedirs(local_dir, exist_ok=True)
+    print(f"Wav2Vec2-MOS はライブラリ経由で利用可能です。ディレクトリ: {local_dir}")
 
 def main():
     # huggingface_hub のインストール確認
