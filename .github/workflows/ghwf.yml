@@ -1,0 +1,49 @@
+name: GitHub Workflow (GHWF) - Skill Dispatcher
+
+on:
+  workflow_dispatch:
+    inputs:
+      skill_type:
+        description: '実行するスキルの種類を選択'
+        required: true
+        default: 'generation'
+        type: choice
+        options:
+          - generation (音声生成)
+          - evaluation (品質評価)
+          - processing (前処理・変換)
+          - training (追加学習)
+      script_path:
+        description: '実行するスクリプトのパス'
+        required: true
+        default: 'src/tts-multi-selector.py'
+      extra_args:
+        description: 'スクリプトに渡す引数'
+        required: false
+        default: ''
+
+jobs:
+  execute-skill:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Environment
+      run: docker compose -f docker-compose.cpu.yml build
+
+    - name: Run Selected Skill
+      run: |
+        echo "Executing Skill: ${{ github.event.inputs.skill_type }}"
+        docker compose -f docker-compose.cpu.yml run --rm snsw-ai python ${{ github.event.inputs.script_path }} ${{ github.event.inputs.extra_args }}
+
+    - name: Upload Results (Artifacts)
+      uses: actions/upload-artifact@v4
+      with:
+        name: ghwf-results-${{ github.run_id }}
+        path: |
+          tts_outputs/
+          docs/report_*.md
+        if-no-files-found: warn
