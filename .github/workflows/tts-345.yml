@@ -1,0 +1,63 @@
+name: TTS Multi-Model Generation (3,4,5) & HF Upload
+
+on:
+  workflow_dispatch:
+    inputs:
+      text:
+        description: 'Text to synthesize'
+        required: true
+        default: 'こんにちわ、志ん生です。今日も一席お付き合い願います。'
+
+jobs:
+  tts-generation:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build and Run TTS Models
+      run: |
+        # CPU環境で実行可能な設定を使用
+        docker compose -f docker-compose.cpu.yml build
+        
+        echo "Starting Model 3: GPT-SoVITS..."
+        docker compose -f docker-compose.cpu.yml run --rm -e TTS_MODEL=3 -e TTS_TEXT="${{ github.event.inputs.text }}" tts-app python src/tts-multi-selector.py
+        
+        echo "Starting Model 4: Fish-Speech..."
+        docker compose -f docker-compose.cpu.yml run --rm -e TTS_MODEL=4 -e TTS_TEXT="${{ github.event.inputs.text }}" tts-app python src/tts-multi-selector.py
+        
+        echo "Starting Model 5: StyleTTS2..."
+        docker compose -f docker-compose.cpu.yml run --rm -e TTS_MODEL=5 -e TTS_TEXT="${{ github.event.inputs.text }}" tts-app python src/tts-multi-selector.py
+
+    - name: Upload to Hugging Face (ghfs)
+      env:
+        HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        HF_REPO: ${{ secrets.HF_REPO }} # e.g., username/repo-name
+      run: |
+        # Hugging Face Hub CLI を使用して生成されたWAVファイルをアップロード
+        pip install huggingface_hub
+        python -c "
+        from huggingface_hub import HfApi
+        import os
+        api = HfApi()
+        token = os.getenv('HF_TOKEN')
+        repo_id = os.getenv('HF_REPO')
+        if token and repo_id:
+            api.upload_folder(
+                folder_path='tts_outputs',
+                repo_id=repo_id,
+                repo_type='dataset',
+                token=token,
+                path_in_repo=f'outputs/{os.getenv(\"GITHUB_RUN_ID\")}'
+            )
+        else:
+            print('HF_TOKEN or HF_REPO not found. Skipping upload.')
+        "
+
+    - name: Upload Artifacts (Fallback)
+      uses: actions/upload-artifact@v3
+      with:
+        name: tts-wav-outputs
+        path: tts_outputs/*.wav
