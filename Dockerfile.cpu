@@ -1,0 +1,19 @@
+# SNSW AI - CPU Optimized Image
+FROM snsw-ai-base AS builder
+RUN pip3 install --no-cache-dir torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+RUN python3 src/model-manager-agent.py download-all
+RUN pip3 install --no-cache-dir .
+
+FROM ubuntu:22.04 AS runtime
+ENV PYTHONPATH="/app/src"
+RUN apt-get update && apt-get install -y --no-install-recommends python3-pip curl ffmpeg git libsndfile1 && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+COPY --from=builder /usr/local/lib/python3.10/dist-packages /usr/local/lib/python3.10/dist-packages
+COPY --from=builder /usr/bin/python3 /usr/bin/python3
+COPY --from=builder /root/.local/share/tts /root/.local/share/tts
+COPY --from=builder /app/models /app/models
+COPY --from=builder /root/.cache/huggingface /root/.cache/huggingface
+COPY . .
+RUN mkdir -p /app/tts_outputs && chmod -R 755 /app
+ENTRYPOINT ["python3"]
+CMD ["src/kaggle/run_inference.py", "--help"]

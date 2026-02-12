@@ -1,0 +1,32 @@
+x-base: &base
+  tty: true
+  stdin_open: true
+  environment:
+    - KAGGLE_ENVIRONMENT=0
+    - TORCH_HOME=/root/.cache/torch
+    - HF_HOME=/root/.cache/huggingface
+    - COQUI_TOS_AGREED=1
+    - HSA_OVERRIDE_GFX_VERSION=10.3.0
+  volumes:
+    - .:/app
+    - ./tts_outputs:/app/tts_outputs
+    # Cloud Path Examples (Kaggle/Colab)
+    # - /kaggle/working/models:/app/models
+
+services:
+  snsw-ai-gpu:
+    <<: *base
+    # URL: https://www.kaggle.com/ / https://colab.research.google.com/
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+    image: snsw-ai-gpu-image
+    container_name: snsw-ai-gpu-container
+    devices:
+      - "/dev/kfd:/dev/kfd"
+      - "/dev/dri:/dev/dri"
+    security_opt:
+      - seccomp:unconfined
+    group_add:
+      - video
+      - render

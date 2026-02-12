@@ -1,0 +1,21 @@
+# Common Base Image for SNSW AI
+FROM ubuntu:22.04 AS base
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    KAGGLE_ENVIRONMENT=0 \
+    COQUI_TOS_AGREED=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3-pip python3-dev build-essential cmake curl ffmpeg git libsndfile1 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy registry and dependencies
+COPY src/models.json src/model-manager-agent.py requirements.txt ./src/
+COPY pyproject.toml README.md ./
+
+# Install common dependencies (except torch)
+RUN grep -v "torch" requirements.txt > req_no_torch.txt && \
+    pip3 install --no-cache-dir -r req_no_torch.txt

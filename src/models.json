@@ -1,0 +1,101 @@
+{
+  "vlm": {
+    "name": "Moondream2",
+    "huggingface_id": "vikhyatk/moondream2",
+    "remote_url": "https://huggingface.co/vikhyatk/moondream2",
+    "local_path": "C:/Models/VLM/moondream2",
+    "container_path": "/root/.cache/huggingface/hub/models--vikhyatk--moondream2",
+    "description": "Visual Language Model for image analysis",
+    "type": "huggingface"
+  },
+  "tts_xtts": {
+    "name": "XTTS-v2",
+    "huggingface_id": "coqui/XTTS-v2",
+    "remote_url": "https://huggingface.co/coqui/XTTS-v2",
+    "local_path": "C:/Models/TTS/xtts_v2",
+    "container_path": "/root/.local/share/tts/tts_models--multilingual--multi-dataset--xtts_v2",
+    "description": "Multilingual text-to-speech with voice cloning",
+    "type": "tts_api"
+  },
+  "tts_sovits": {
+    "name": "GPT-SoVITS",
+    "huggingface_id": "lj1995/GPT-SoVITS",
+    "remote_url": "https://huggingface.co/lj1995/GPT-SoVITS/resolve/main/gsv-v2final-fix.ckpt",
+    "local_path": "C:/Models/TTS/gpt-sovits",
+    "container_path": "/app/models/gpt-sovits",
+    "description": "High-quality Japanese TTS base models",
+    "type": "direct_download"
+  },
+  "whisper": {
+    "name": "Faster-Whisper (large-v3)",
+    "huggingface_id": "Systran/faster-whisper-large-v3",
+    "remote_url": "https://huggingface.co/Systran/faster-whisper-large-v3",
+    "local_path": "C:/Models/Whisper",
+    "container_path": "/root/.cache/huggingface/hub/models--Systran--faster-whisper-large-v3",
+    "description": "High-speed speech-to-text model",
+    "type": "whisper_api"
+  },
+  "styletts2": {
+    "name": "StyleTTS2",
+    "huggingface_id": "yl4579/StyleTTS2-LibriTTS",
+    "remote_url": "https://huggingface.co/yl4579/StyleTTS2-LibriTTS/resolve/main/Models/LibriTTS/epochs_2nd_00020.pth",
+    "local_path": "C:/Models/StyleTTS2",
+    "container_path": "/app/models/StyleTTS2",
+    "description": "High-quality style-based TTS",
+    "type": "direct_download"
+  },
+  "tts_fish_speech": {
+    "name": "Fish-Speech",
+    "huggingface_id": "fishaudio/fish-speech-1.4",
+    "remote_url": "https://huggingface.co/fishaudio/fish-speech-1.4",
+    "local_path": "C:/Models/TTS/fish-speech",
+    "container_path": "/app/models/fish-speech",
+    "description": "State-of-the-art multi-lingual TTS",
+    "type": "huggingface"
+  },
+  "sd_models": {
+    "name": "Stable Diffusion Checkpoints",
+    "huggingface_id": "runwayml/stable-diffusion-v1-5",
+    "remote_url": "https://huggingface.co/runwayml/stable-diffusion-v1-5",
+    "local_path": "C:/Models/StableDiffusion",
+    "container_path": "/app/models/StableDiffusion",
+    "description": "Base models and fine-tuned weights for image generation",
+    "type": "manual"
+  },
+  "sd_lora": {
+    "name": "Stable Diffusion LoRA",
+    "huggingface_id": "various",
+    "remote_url": "https://civitai.com/",
+    "local_path": "C:/Models/Lora",
+    "container_path": "/app/models/Lora",
+    "description": "LoRA weights for style/character control",
+    "type": "manual"
+  },
+  "sd_vae": {
+    "name": "Stable Diffusion VAE",
+    "huggingface_id": "stabilityai/sd-vae-ft-mse",
+    "remote_url": "https://huggingface.co/stabilityai/sd-vae-ft-mse-original/resolve/main/vae-ft-mse-840000-ema-pruned.ckpt",
+    "local_path": "C:/Models/VAE",
+    "container_path": "/app/models/VAE",
+    "description": "Variational Autoencoders for SD",
+    "type": "direct_download"
+  },
+  "eval_models": {
+    "name": "Evaluation Models (UTMOS/ASV)",
+    "huggingface_id": "various",
+    "remote_url": "https://github.com/nii-yamagishilab/mos-prediction",
+    "local_path": "C:/Models/eval",
+    "container_path": "/app/models/eval",
+    "description": "Models for MOS prediction and speaker verification",
+    "type": "manual"
+  },
+  "torch_cache": {
+    "name": "PyTorch Hub/Cache",
+    "huggingface_id": "none",
+    "remote_url": "https://pytorch.org/docs/stable/hub.html",
+    "local_path": "C:/Models/Torch",
+    "container_path": "/root/.cache/torch",
+    "description": "Common torch model weights and kernels",
+    "type": "manual"
+  }
+}

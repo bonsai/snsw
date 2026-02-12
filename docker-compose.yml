@@ -1,31 +1,31 @@
+x-base: &base
+  tty: true
+  stdin_open: true
+  environment:
+    - KAGGLE_ENVIRONMENT=0
+    - TORCH_HOME=/root/.cache/torch
+    - HF_HOME=/root/.cache/huggingface
+    - COQUI_TOS_AGREED=1
+  volumes:
+    - .:/app
+    - ./tts_outputs:/app/tts_outputs
+    # Local Model Mounts (Optional)
+    - C:/Models/VLM/moondream2:/root/.cache/huggingface/hub/models--vikhyatk--moondream2
+    - C:/Models/TTS/xtts_v2:/root/.local/share/tts/tts_models--multilingual--multi-dataset--xtts_v2
+    - C:/Models/TTS/gpt-sovits:/app/models/gpt-sovits
+    - C:/Models/TTS/fish-speech:/app/models/fish-speech
+    - C:/Models/Whisper:/root/.cache/huggingface/hub/models--Systran--faster-whisper-large-v3
+    - C:/Models/StyleTTS2:/app/models/StyleTTS2
+    - C:/Models/StableDiffusion:/app/models/StableDiffusion
+    - C:/Models/Lora:/app/models/Lora
+    - C:/Models/VAE:/app/models/VAE
+    - C:/Models/eval:/app/models/eval
+
 services:
-  snsw-ai:
+  snsw-ai-cpu:
+    <<: *base
     build:
       context: .
-      dockerfile: Dockerfile.optimized
-    container_name: snsw-ai-container
-    volumes:
-      # ソースコードのマウント
-      - .:/app
-      # モデルデータを C:\models に集約（複数回実行で再利用）
-      - C:\models:/app/models
-      # キャッシュディレクトリ（Hugging Face, PyTorch, Coqui TTS等）
-      - C:\models\.cache:/root/.cache
-      - C:\models\.local:/root/.local
-      # 出力ディレクトリ
-      - ./tts_outputs:/app/tts_outputs
-      - ./data:/app/data
-      - ./dev:/app/dev
-    # devices:
-    #   - /dev/kfd:/dev/kfd
-    #   - /dev/dri:/dev/dri
-    environment:
-      - KAGGLE_ENVIRONMENT=0
-      - HSA_OVERRIDE_GFX_VERSION=10.3.0
-      # モデルキャッシュの場所を明示的に指定
-      - TORCH_HOME=/root/.cache/torch
-      - HF_HOME=/root/.cache/huggingface
-      - TRANSFORMERS_CACHE=/root/.cache/huggingface/transformers
-      - XDG_CACHE_HOME=/root/.cache
-    tty: true
-    stdin_open: true
+      dockerfile: Dockerfile.cpu
+    image: snsw-ai-cpu-image
+    container_name: snsw-ai-cpu-container

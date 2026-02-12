@@ -1,0 +1,29 @@
+# Base ML Dependencies
+torch
+torchaudio
+TTS
+cutlet
+mecab-python3
+unidic-lite
+datasets
+faster-whisper
+librosa
+peft
+safetensors
+scipy
+transformers>=4.44.0
+accelerate
+soundfile
+packaging
+sentencepiece
+einops
+vector-quantize-pytorch
+vocos
+gradio
+pyyaml
+pydantic
+
+# Fish-Speech Specific
+fish-speech
+ormsgpack
+# Add other specific versions if needed for Fish-Speech 1.4

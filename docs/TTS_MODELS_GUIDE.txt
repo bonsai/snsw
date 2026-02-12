@@ -1,0 +1,38 @@
+# 3つのTTSモデル実行ガイド
+
+## モデル構成
+- GPT-SoVITS: `/app/models/gpt-sovits/`
+- Fish-Speech: `/app/models/fish-speech/`
+- StyleTTS2: `/app/models/styletts2/`
+
+## 実行コマンド（PowerShell）
+
+# GPT-SoVITS で実行
+docker run --rm `
+  -v ${PWD}:/app `
+  -v 'C:\Models\TTS:/app/models' `
+  snsw-snsw-ai `
+  python3 src/tts_gpt_sovits.py
+
+# Fish-Speech で実行
+docker run --rm `
+  -v ${PWD}:/app `
+  -v 'C:\Models\TTS:/app/models' `
+  snsw-snsw-ai `
+  python3 src/tts_fish_speech.py
+
+# StyleTTS2 で実行
+docker run --rm `
+  -v ${PWD}:/app `
+  -v 'C:\Models\TTS:/app/models' `
+  snsw-snsw-ai `
+  python3 src/tts_styletts2.py
+
+## または docker-compose で実行
+
+docker compose -f docker-compose.models.yml run --rm snsw-ai-gpt-sovits
+docker compose -f docker-compose.models.yml run --rm snsw-ai-fish-speech
+docker compose -f docker-compose.models.yml run --rm snsw-ai-styletts2
+
+## 出力
+すべての音声ファイルは `tts_outputs/` に保存されます
